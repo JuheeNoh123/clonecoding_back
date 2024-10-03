@@ -1,11 +1,13 @@
 package CGVcloneCoding.cloneCoding.controller;
 
 import CGVcloneCoding.cloneCoding.DTO.MovieDTO;
+import CGVcloneCoding.cloneCoding.DTO.ScreeningDTO;
 import CGVcloneCoding.cloneCoding.domain.Movie;
 import CGVcloneCoding.cloneCoding.service.MovieScheduleService;
 import CGVcloneCoding.cloneCoding.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,13 @@ import java.util.List;
 public class MovieController {
     private final MovieService movieService;
     private final MovieScheduleService movieScheduleService;
+
+    //개발 테스트 용
+    @GetMapping("/test")
+    public void test() throws IOException, InterruptedException {
+        //movieService.PlayingMovie();
+        //movieScheduleService.generateNewSchedule();
+    }
 
     //영화 리스트 출력(상영예정 + 현재 상영중인 영화)
     @Operation(summary="영화 리스트 출력",
@@ -125,9 +134,16 @@ public class MovieController {
     }
 
     //상영 가능 날짜 출력
-    @GetMapping("/ticket/{movieId}/{theaterId}")
-    public List<LocalDate> availableTheaterDate(@PathVariable("movieId") long movieId, @PathVariable("theaterId") long theaterId ){
-        return movieScheduleService.availableTheaterDate(movieId, theaterId);
+    @GetMapping("/ticket/{movieId}/{BranchId}")
+    public List<LocalDate> availableTheaterDate(@PathVariable("movieId") long movieId, @PathVariable("BranchId") long branchId ){
+        return movieScheduleService.availableTheaterDate(movieId, branchId);
+    }
+
+    @GetMapping("/ticket/{movieId}/{theaterId}/{screeningDate}")
+    public List<ScreeningDTO.theaterSeats> availableTheaterSeats(@PathVariable("movieId") long movieId,
+                                      @PathVariable("theaterId") long theaterId,
+                                      @PathVariable("screeningDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate screeningDate) {
+        return movieScheduleService.availableTheaterSeats(movieId, theaterId, screeningDate);
     }
 
 

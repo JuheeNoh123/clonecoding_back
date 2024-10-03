@@ -1,8 +1,11 @@
 package CGVcloneCoding.cloneCoding.service;
 
+import CGVcloneCoding.cloneCoding.DTO.ScreeningDTO;
+import CGVcloneCoding.cloneCoding.domain.Branch;
 import CGVcloneCoding.cloneCoding.domain.Movie;
 import CGVcloneCoding.cloneCoding.domain.Screening;
 import CGVcloneCoding.cloneCoding.domain.Theater;
+import CGVcloneCoding.cloneCoding.repository.BranchRepository;
 import CGVcloneCoding.cloneCoding.repository.MovieRepository;
 import CGVcloneCoding.cloneCoding.repository.ScreeningRepository;
 import CGVcloneCoding.cloneCoding.repository.TheaterRepository;
@@ -11,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -21,6 +25,7 @@ public class MovieScheduleService {
     private final MovieRepository movieRepository;
     private final TheaterRepository theaterRepository;
     private final ScreeningRepository screeningRepository;
+    private final BranchRepository branchRepository;
 
     @Scheduled(cron = "0 0 1 1 * ?") // 매월 1일 오전 1시에 스케줄 재생성
     @Transactional
@@ -174,13 +179,43 @@ public class MovieScheduleService {
         return newMovie;
     }
 
-    public List<LocalDate> availableTheaterDate(Long movieId, Long theaterId) {
+
+    //영화 예매 - 극장 지점까지 선택했을때
+    public List<LocalDate> availableTheaterDate(Long movieId, Long branchId) {
         Movie movie = movieRepository.getMovie(movieId);
-        Theater theater = theaterRepository.findTheater(theaterId);
-        List<LocalDate> strList= screeningRepository.availableDate(movie, theater);
+        Branch branch = branchRepository.findBranch(branchId);
+        List<LocalDate> strList= screeningRepository.availableDate(movie, branch);
         Set<LocalDate> set = new HashSet<>(strList);
         List<LocalDate> newStrList = new ArrayList<>(set);
         Collections.sort(newStrList);
         return newStrList;
     }
+
+    //영화 예매 - 극장 지점 -> 날짜 까지 선택 했을 때
+    public List<ScreeningDTO.theaterSeats> availableTheaterSeats(Long movieId, Long theaterId, LocalDate screeningDate) {
+        Movie movie = movieRepository.getMovie(movieId);
+
+        int runTime = movie.getRuntime();
+        // 러닝 타임을 Duration으로 변환
+        Duration duration = Duration.ofMinutes(runTime);
+
+        Theater theater = theaterRepository.findTheater(theaterId);
+        List<Object[]> theaterSeats =  screeningRepository.availableTheaterSeats(movie, theater, screeningDate);
+        System.out.println(theaterSeats);
+        List<ScreeningDTO.theaterSeats> theaterSeatsList = new ArrayList<>();
+        for (Object[] theaterSeat : theaterSeats) {
+
+            Screening screening = (Screening) theaterSeat[0]; // Screening 객체
+            Branch branch = (Branch) theaterSeat[1]; // Branch 객체로 캐스팅
+            LocalTime startTime = screening.getStartTime();
+            // 시작 시간에 러닝 타임을 더함
+            LocalTime endTime = startTime.plus(duration);
+            String theaterNum = screening.getTheater().getName() + '관';
+
+            theaterSeatsList.add(new ScreeningDTO.theaterSeats(theaterNum, startTime, endTime,branch.getName()));
+        }
+        return theaterSeatsList;
+
+    }
+
 }

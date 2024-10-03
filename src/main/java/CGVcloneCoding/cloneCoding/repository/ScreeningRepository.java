@@ -1,5 +1,6 @@
 package CGVcloneCoding.cloneCoding.repository;
 
+import CGVcloneCoding.cloneCoding.domain.Branch;
 import CGVcloneCoding.cloneCoding.domain.Movie;
 import CGVcloneCoding.cloneCoding.domain.Screening;
 import CGVcloneCoding.cloneCoding.domain.Theater;
@@ -11,5 +12,7 @@ public interface ScreeningRepository {
     void save(Screening screeningEntry);
 
 
-    List<LocalDate> availableDate(Movie movie, Theater theater);
+    List<LocalDate> availableDate(Movie movie, Branch branch);
+
+    List<Object[]> availableTheaterSeats(Movie movie, Theater theater, LocalDate screeningDate);
 }
