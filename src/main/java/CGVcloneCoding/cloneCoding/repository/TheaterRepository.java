@@ -1,5 +1,6 @@
 package CGVcloneCoding.cloneCoding.repository;
 
+import CGVcloneCoding.cloneCoding.domain.Branch;
 import CGVcloneCoding.cloneCoding.domain.Theater;
 
 import java.util.List;
@@ -7,5 +8,5 @@ import java.util.List;
 public interface TheaterRepository {
     List<Theater> findAll();
 
-    Theater findTheater(Long TheaterId);
+    Theater findTheater(Long TheaterId, Branch branch);
 }

@@ -54,7 +54,7 @@ public class MovieScheduleService {
             Map<LocalDate, Long> lastScreeningMap = new HashMap<>(); // 마지막 상영 영화 ID를 저장할 맵
 
             // 랜덤으로 상영할 시간 10개 선택
-            List<LocalTime> selectedShowtimes = getRandomShowtimes(availableShowtimes,10);
+            List<LocalTime> selectedShowtimes = getRandomShowtimes(availableShowtimes,90);
 
 
             // 개봉일 기준으로 날짜 범위 설정
@@ -192,21 +192,20 @@ public class MovieScheduleService {
     }
 
     //영화 예매 - 극장 지점 -> 날짜 까지 선택 했을 때
-    public List<ScreeningDTO.theaterSeats> availableTheaterSeats(Long movieId, Long theaterId, LocalDate screeningDate) {
+    public List<ScreeningDTO.theaterSeats> availableTheaterSeats(Long movieId, Long branchId, LocalDate screeningDate) {
         Movie movie = movieRepository.getMovie(movieId);
 
         int runTime = movie.getRuntime();
         // 러닝 타임을 Duration으로 변환
         Duration duration = Duration.ofMinutes(runTime);
 
-        Theater theater = theaterRepository.findTheater(theaterId);
-        List<Object[]> theaterSeats =  screeningRepository.availableTheaterSeats(movie, theater, screeningDate);
+        Branch branch = branchRepository.findBranch(branchId);
+        List<Object[]> theaterSeats =  screeningRepository.availableTheaterSeats(movie, branch, screeningDate);
         System.out.println(theaterSeats);
         List<ScreeningDTO.theaterSeats> theaterSeatsList = new ArrayList<>();
         for (Object[] theaterSeat : theaterSeats) {
 
             Screening screening = (Screening) theaterSeat[0]; // Screening 객체
-            Branch branch = (Branch) theaterSeat[1]; // Branch 객체로 캐스팅
             LocalTime startTime = screening.getStartTime();
             // 시작 시간에 러닝 타임을 더함
             LocalTime endTime = startTime.plus(duration);
@@ -217,5 +216,6 @@ public class MovieScheduleService {
         return theaterSeatsList;
 
     }
+
 
 }

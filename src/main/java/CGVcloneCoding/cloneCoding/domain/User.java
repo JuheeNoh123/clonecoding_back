@@ -2,10 +2,11 @@ package CGVcloneCoding.cloneCoding.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor
 @Getter
 public class User {
     @Id
@@ -13,7 +14,7 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String userId;
 
     @Column(nullable = false)
     private String password;
@@ -21,8 +22,13 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    // Constructor, Getters and Setters
-    public User() {
+    public User(String userId, String password) {
+        this.userId = userId;
+        this.password = password;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public boolean checkPassword(String rawpassword) {
+        return this.password.equals(rawpassword);
     }
 }

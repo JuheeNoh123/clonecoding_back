@@ -29,7 +29,7 @@ public class MovieController {
     @GetMapping("/test")
     public void test() throws IOException, InterruptedException {
         //movieService.PlayingMovie();
-        //movieScheduleService.generateNewSchedule();
+        movieScheduleService.generateNewSchedule();
     }
 
     //영화 리스트 출력(상영예정 + 현재 상영중인 영화)
@@ -139,6 +139,8 @@ public class MovieController {
         return movieScheduleService.availableTheaterDate(movieId, branchId);
     }
 
+
+    //상영 관 , 시간 출력
     @GetMapping("/ticket/{movieId}/{theaterId}/{screeningDate}")
     public List<ScreeningDTO.theaterSeats> availableTheaterSeats(@PathVariable("movieId") long movieId,
                                       @PathVariable("theaterId") long theaterId,

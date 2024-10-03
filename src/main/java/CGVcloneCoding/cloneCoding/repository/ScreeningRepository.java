@@ -6,6 +6,7 @@ import CGVcloneCoding.cloneCoding.domain.Screening;
 import CGVcloneCoding.cloneCoding.domain.Theater;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface ScreeningRepository {
@@ -14,5 +15,7 @@ public interface ScreeningRepository {
 
     List<LocalDate> availableDate(Movie movie, Branch branch);
 
-    List<Object[]> availableTheaterSeats(Movie movie, Theater theater, LocalDate screeningDate);
+    List<Object[]> availableTheaterSeats(Movie movie, Branch branch, LocalDate screeningDate);
+
+    Screening getScreening(LocalDate screeningDate, LocalTime startTime, Movie movie, Theater theater);
 }
