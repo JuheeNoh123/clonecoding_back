@@ -20,7 +20,7 @@ public class JPATheaterRepository implements TheaterRepository {
     }
 
     @Override
-    public Theater findTheater(Long TheaterNum, Branch branch){
+    public Theater findTheater(String TheaterNum, Branch branch){
         String query = "SELECT t FROM Theater t WHERE t.name = :TheaterNum and t.branch = :branch";
         return em.createQuery(query, Theater.class).setParameter("TheaterNum", TheaterNum)
                 .setParameter("branch", branch).getSingleResult();

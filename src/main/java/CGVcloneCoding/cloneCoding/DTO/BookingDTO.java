@@ -29,8 +29,16 @@ public class BookingDTO {
         public LocalDate screeningDate;
         public LocalTime screeningTime;
         public Long branchId;
-        public Long theaterNum;
+        public String theaterNum;
+        public List<TicketsCategory> ticketsCategory;
         public List<SeatDTO.Seats> seats;
+
+    }
+
+    @Data
+    public static class TicketsCategory{
+        public String ticketType;
+        public int ticketCount;
     }
 
     public static class checkBooking{
@@ -42,5 +50,18 @@ public class BookingDTO {
         public String theaterName;
         public List<SeatDTO.Seats> seats;
 
+    }
+
+    @Data
+    public static class chooseTheaterAndTime{
+        public String theaterName;
+        public LocalTime screeningTime;
+    }
+
+    @Data
+    public static class ShowSeatsDTO{
+        public String branchName;
+        public String theaterName;
+        public List<SeatDTO.Seats> seats;
     }
 }

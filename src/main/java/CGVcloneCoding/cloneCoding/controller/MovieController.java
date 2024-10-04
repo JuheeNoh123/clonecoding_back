@@ -141,11 +141,11 @@ public class MovieController {
 
 
     //상영 관 , 시간 출력
-    @GetMapping("/ticket/{movieId}/{theaterId}/{screeningDate}")
+    @GetMapping("/ticket/{movieId}/{branchId}/{screeningDate}")
     public List<ScreeningDTO.theaterSeats> availableTheaterSeats(@PathVariable("movieId") long movieId,
-                                      @PathVariable("theaterId") long theaterId,
+                                      @PathVariable("branchId") long branchId,
                                       @PathVariable("screeningDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate screeningDate) {
-        return movieScheduleService.availableTheaterSeats(movieId, theaterId, screeningDate);
+        return movieScheduleService.availableTheaterSeats(movieId, branchId, screeningDate);
     }
 
 

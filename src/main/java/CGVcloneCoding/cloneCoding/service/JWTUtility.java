@@ -1,8 +1,6 @@
 package CGVcloneCoding.cloneCoding.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -31,8 +29,12 @@ public class JWTUtility {
                     .getBody();
 
             return claims;
-        } catch(Exception ex) {
-            throw ex;
+        } catch (ExpiredJwtException ex) {
+            // 토큰이 만료된 경우
+            throw new RuntimeException("토큰이 만료되었습니다: " + ex.getMessage());
+        } catch (JwtException | IllegalArgumentException ex) {
+            // 토큰이 유효하지 않거나 잘못된 경우
+            throw new RuntimeException("잘못된 토큰입니다: " + ex.getMessage());
         }
     }
 }

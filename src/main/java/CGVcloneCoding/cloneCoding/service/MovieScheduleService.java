@@ -1,14 +1,12 @@
 package CGVcloneCoding.cloneCoding.service;
 
+import CGVcloneCoding.cloneCoding.DTO.BookingDTO;
 import CGVcloneCoding.cloneCoding.DTO.ScreeningDTO;
 import CGVcloneCoding.cloneCoding.domain.Branch;
 import CGVcloneCoding.cloneCoding.domain.Movie;
 import CGVcloneCoding.cloneCoding.domain.Screening;
 import CGVcloneCoding.cloneCoding.domain.Theater;
-import CGVcloneCoding.cloneCoding.repository.BranchRepository;
-import CGVcloneCoding.cloneCoding.repository.MovieRepository;
-import CGVcloneCoding.cloneCoding.repository.ScreeningRepository;
-import CGVcloneCoding.cloneCoding.repository.TheaterRepository;
+import CGVcloneCoding.cloneCoding.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,9 +21,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MovieScheduleService {
     private final MovieRepository movieRepository;
+    private final SeatRepository seatRepository;
     private final TheaterRepository theaterRepository;
     private final ScreeningRepository screeningRepository;
     private final BranchRepository branchRepository;
+    private final BookingService bookingService;
 
     @Scheduled(cron = "0 0 1 1 * ?") // 매월 1일 오전 1시에 스케줄 재생성
     @Transactional
@@ -201,7 +201,6 @@ public class MovieScheduleService {
 
         Branch branch = branchRepository.findBranch(branchId);
         List<Object[]> theaterSeats =  screeningRepository.availableTheaterSeats(movie, branch, screeningDate);
-        System.out.println(theaterSeats);
         List<ScreeningDTO.theaterSeats> theaterSeatsList = new ArrayList<>();
         for (Object[] theaterSeat : theaterSeats) {
 
@@ -210,8 +209,14 @@ public class MovieScheduleService {
             // 시작 시간에 러닝 타임을 더함
             LocalTime endTime = startTime.plus(duration);
             String theaterNum = screening.getTheater().getName() + '관';
-
-            theaterSeatsList.add(new ScreeningDTO.theaterSeats(theaterNum, startTime, endTime,branch.getName()));
+            long totalCount = seatRepository.totalSeatCounting(screening.getTheater());
+            String totalSeats = '총'+ String.valueOf(totalCount)+'석';
+            BookingDTO.ShowSeatsDTO showSeatsDTO = bookingService.showBookingSeats(movieId, branchId, screeningDate, screening.getTheater().getName(), startTime);
+            long bookedCount = showSeatsDTO.getSeats().size();
+            System.out.println(bookedCount);
+            System.out.println(seatRepository.totalSeatCounting(screening.getTheater()));
+            String remainSeats = String.valueOf(totalCount-bookedCount) + '석';
+            theaterSeatsList.add(new ScreeningDTO.theaterSeats(theaterNum, startTime, endTime,branch.getName(), totalSeats, remainSeats));
         }
         return theaterSeatsList;
 

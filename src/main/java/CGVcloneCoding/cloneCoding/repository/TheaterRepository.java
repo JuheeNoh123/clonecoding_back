@@ -8,5 +8,5 @@ import java.util.List;
 public interface TheaterRepository {
     List<Theater> findAll();
 
-    Theater findTheater(Long TheaterId, Branch branch);
+    Theater findTheater(String TheaterNum, Branch branch);
 }

@@ -18,6 +18,8 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String ticketType;
+    private int ticketPrice;
 
     @ManyToOne
     @JoinColumn(name = "screening_id")
@@ -34,11 +36,15 @@ public class Booking {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Booking(Screening screening, Seat seat, User user) {
+    private String bookingNumber;
+
+    public Booking(Screening screening, Seat seat, User user, String ticketType, int ticketPrice) {
         this.screening = screening;
         this.seat = seat;
         this.bookingTime = LocalDateTime.now();
         this.user = user;
+        this.ticketType = ticketType;
+        this.ticketPrice = ticketPrice;
     }
 
 
