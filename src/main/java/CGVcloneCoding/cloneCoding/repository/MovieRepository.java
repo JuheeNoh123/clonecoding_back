@@ -12,6 +12,11 @@ public interface MovieRepository {
     Movie getMovie(long id);
 
     List<Movie> getAllPlayingMovies();
+
+    List<Movie> getAllPlayingMoviesBYvote();
+
+    List<Movie> getAllPlayingMoviesBYvoteCount();
+
     List<Movie> getAllUpcomingMovies();
 
     List<Movie> getAllMovies();

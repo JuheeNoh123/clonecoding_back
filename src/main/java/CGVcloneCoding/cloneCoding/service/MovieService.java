@@ -304,9 +304,19 @@ public class MovieService {
         return genre_list;
     }
 
-    //현재 상영중인 영화 출력
-    public List<Movie> getPlayingMovieList() throws IOException, InterruptedException {
+    //현재 상영중인 영화 출력 - 평점순(인기도순)
+    public List<Movie> getPlayingMovieList() {
         return movieRepository.getAllPlayingMovies();
+    }
+
+    //현재 상영중인 영화 출력 - 예매율순(투표율순)
+    public List<Movie> getPlayingMovieListBYvote() {
+        return movieRepository.getAllPlayingMoviesBYvote();
+    }
+
+    //현재 상영중인 영화 출력 - 관람객순(투표개수)
+    public List<Movie> getPlayingMovieListBYvoteCount() {
+        return movieRepository.getAllPlayingMoviesBYvoteCount();
     }
 
     //상영 예정 영화 출력

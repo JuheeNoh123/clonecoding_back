@@ -28,8 +28,20 @@ public class JPAMovieRepository implements MovieRepository {
     }
 
     @Override
-    public List<Movie> getAllPlayingMovies() {
+    public List<Movie> getAllPlayingMovies() {//평점순 - 인기
         String jpql =  "SELECT m FROM Movie m WHERE m.release_date <= CURRENT_DATE ORDER BY m.popularity DESC";
+        return em.createQuery(jpql, Movie.class).getResultList();
+    }
+
+    @Override
+    public List<Movie> getAllPlayingMoviesBYvote() {//예매율순-투표율
+        String jpql =  "SELECT m FROM Movie m WHERE m.release_date <= CURRENT_DATE ORDER BY m.vote_average DESC";
+        return em.createQuery(jpql, Movie.class).getResultList();
+    }
+
+    @Override
+    public List<Movie> getAllPlayingMoviesBYvoteCount() {   //관람객순 - 투표개수 순
+        String jpql =  "SELECT m FROM Movie m WHERE m.release_date <= CURRENT_DATE ORDER BY m.vote_count DESC";
         return em.createQuery(jpql, Movie.class).getResultList();
     }
 

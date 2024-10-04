@@ -60,6 +60,25 @@ public class MovieController {
         return movieDTOBuilderList;
     }
 
+    @GetMapping("/movies/nowplaying/{sortId}")
+    public List<MovieDTO.MovieDTOBuilder> getPlayingMoviesBySortId(@PathVariable("sortId") int sortId) throws IOException, InterruptedException {
+        List<Movie> movieList = new ArrayList<>();
+        List<MovieDTO.MovieDTOBuilder> movieDTOBuilderList = new ArrayList<>();
+        if (sortId == 1){ // - 예매율순(투표율순)
+            movieList = movieService.getPlayingMovieListBYvote();
+        }
+        else if (sortId == 2){ //- 평점순(인기도순)
+            movieList = movieService.getPlayingMovieList();
+        }
+        else if (sortId == 3){ //- 관람객순(투표개수)
+            movieList = movieService.getPlayingMovieListBYvoteCount();
+        }
+        for (Movie movie : movieList) {
+            movieDTOBuilderList.add(new MovieDTO.MovieDTOBuilder(movie));
+        }
+        return movieDTOBuilderList;
+    }
+
 
     //상영 예정인 영화 출력
     @Operation(summary="상영 예정인 영화 리스트 출력", description = "[상영 예정인 영화] 인기순으로 정렬", tags = {"메인페이지"})
