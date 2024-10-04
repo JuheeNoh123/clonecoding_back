@@ -28,8 +28,8 @@ public class MovieController {
     //개발 테스트 용
     @GetMapping("/test")
     public void test() throws IOException, InterruptedException {
-        //movieService.PlayingMovie();
-        movieScheduleService.generateNewSchedule();
+        movieService.PlayingMovie();
+        //movieScheduleService.generateNewSchedule();
     }
 
     //영화 리스트 출력(상영예정 + 현재 상영중인 영화)
