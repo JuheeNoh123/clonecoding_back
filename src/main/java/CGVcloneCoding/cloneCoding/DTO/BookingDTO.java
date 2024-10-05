@@ -69,6 +69,8 @@ public class BookingDTO {
         public String paymentType;
         @Schema(description = "간편결제 중 네이버페이, 카카오페이 같이 한번 더 선택되는 부분 중 내가 선택한 결제 방법 ", example = "카카오페이")
         public String easyPaymentType;
+        @Schema(description = "영화 포스터", example = "/dA1TGJPTVjlqPc8PiEE2PfvFBUp.jpg")
+        public String moviePosterPath;
         @Schema(description = "영화 제목", example = "조커: 폴리 아 되")
         public String movieTitle;
         @Schema(description = "상영 날짜", example = "2024-10-04")
@@ -95,6 +97,22 @@ public class BookingDTO {
     public static class ShowSeatsDTO{
         public String branchName;
         public String theaterName;
+        public List<SeatDTO.Seats> seats;
+    }
+
+    @Data
+    public static class selectSeatsDTO{
+        @Schema(description = "영화 아이디", example = "889737")
+        public Long movieId;
+        @Schema(description = "지점 아이디 (강남, 강변 ID)", example = "1")
+        public Long branchId;
+        @Schema(description = "상영관 몇관인지", example = "2")
+        public String theaterNum;
+        @Schema(description = "상영 날짜", example = "2024-10-04")
+        public LocalDate screeningDate;
+        @Schema(description = "상영 시간", example = "11:45:00")
+        public LocalTime screeningTime;
+        @Schema(description = "선택한 좌석 리스트", example = "[선택한 좌석들 ~]")
         public List<SeatDTO.Seats> seats;
     }
 }

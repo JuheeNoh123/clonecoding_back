@@ -5,9 +5,11 @@ import CGVcloneCoding.cloneCoding.DTO.SeatDTO;
 import CGVcloneCoding.cloneCoding.domain.*;
 import CGVcloneCoding.cloneCoding.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +28,8 @@ public class BookingService {
     private final BranchRepository branchRepository;
     private final PaymentRepository paymentRepository;
     private final UserService userService;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public BookingDTO.ShowSeatsDTO showBookingSeats(long movieId, long branchId,
                                        LocalDate screeningDate, String theaterName,
@@ -116,6 +120,7 @@ public class BookingService {
         response.setEasyPaymentType(easyPaymentType);
         response.setTicketsCategory(ticketsCategories);
         response.setBookingDate(payment.getPaymentTime());
+        response.setMoviePosterPath(movie.getPoster_path());
         return response;
     }
 
@@ -128,6 +133,33 @@ public class BookingService {
             default -> throw new IllegalArgumentException("알 수 없는 티켓 종류입니다: " + ticketType);
         };
     }
+
+    public Boolean checkRedis(Long movieId, Long branchId, String theaterNum,
+                              LocalDate screeningDate, LocalTime screeningTime,
+                              List<SeatDTO.Seats> seats, long holdTimeInSeconds){
+        String key;
+        for (SeatDTO.Seats seat : seats) {
+            key = createRedisKey(movieId, branchId, theaterNum, screeningDate, screeningTime, seat.getRow(), seat.getNum());
+            Boolean equals = redisTemplate.hasKey(key);
+            // 이미 선택된 좌석인지 확인
+            if (Boolean.TRUE.equals(equals)) {
+                return false; // 좌석이 이미 선택된 상태임을 반환
+            }
+        }
+
+        for (SeatDTO.Seats seat : seats) {
+            key = createRedisKey(movieId, branchId, theaterNum, screeningDate, screeningTime, seat.getRow(), seat.getNum());
+            redisTemplate.opsForValue().set(key, true, Duration.ofSeconds(holdTimeInSeconds));
+        }
+
+        return true;
+    }
+
+
+    private String createRedisKey(Long movieId, Long branchId, String theaterName, LocalDate screeningDate, LocalTime screeningTime, String seatRow, int seatNumber) {
+        return movieId + ":" + branchId + ":" + theaterName + ":" + screeningDate.toString() + ":" + screeningTime.toString() + ":" + seatRow + ":" + seatNumber;
+    }
+
 
 
 }

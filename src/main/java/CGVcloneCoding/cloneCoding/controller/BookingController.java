@@ -31,10 +31,22 @@ public class BookingController {
 
     }
 
+    @Operation(summary="좌석 선택시 결제중인 좌석인지 확인하는 API",
+            description = "사용자가 좌석을 선택했을때, " +
+                    "<br>해당 좌석을 다른 사용자가 이미 결제중인 상황일 때 ,False 리턴" +
+                    "<br>아무도 해당 좌석을 결제중이 아니라면 True 리턴" +
+                    "<br> 막아두는 시간 3분으로 정해둠 (3분 이후에 다시 좌석 선택 가능)" +
+                    "<br> 요청 형태는 아래 스키마(selectSeatsDTO) 확인해보면 됩니당 ~",
+            tags = {"예매페이지"})
+    @PostMapping("/selectSeats")
+    public Boolean selectSeats(@RequestBody BookingDTO.selectSeatsDTO request){
+        return bookingService.checkRedis(request.getMovieId(), request.getBranchId(), request.getTheaterNum(), request.getScreeningDate(), request.getScreeningTime(), request.getSeats(), 180);
+    }
+
     @Operation(summary="결제완료 후 결제 정보 및 예매 정보 저장",
             description = "결제완료 후 결제 정보 및 예매 정보 저장 <br>결제 완료 되면 보내주기 " +
-                    "<br>보내줄때 형식은 아래 스키마에 bookingSeat 부분 확인해서 보내주면 될거같아여" +
-                    "<br>예매 후 어떻게 반환 되는지는 스키마에서 checkBooking 부분에 이써여!",
+                    "<br>보내줄때 형식은 아래 스키마(bookingSeat) 확인해서 보내주면 될거같아여" +
+                    "<br>예매 후 어떻게 반환 되는지는 스키마(checkBooking) 확인 하기 ~",
             tags = {"예매페이지"})
     @PostMapping("/booking")
     public BookingDTO.checkBooking booking(@RequestHeader("Authorization") String token ,@RequestBody BookingDTO.bookingSeats request) {
