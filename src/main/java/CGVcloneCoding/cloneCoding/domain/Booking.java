@@ -29,22 +29,21 @@ public class Booking {
     @JoinColumn(name = "seat_id")
     private Seat seat;
 
-    @Column(nullable = false)
-    private LocalDateTime bookingTime;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String bookingNumber;
+    @ManyToOne
+    @JoinColumn(name="payment_id")
+    private Payment payment;
 
-    public Booking(Screening screening, Seat seat, User user, String ticketType, int ticketPrice) {
+    public Booking(Screening screening, Seat seat, User user, String ticketType, int ticketPrice, Payment payment) {
         this.screening = screening;
         this.seat = seat;
-        this.bookingTime = LocalDateTime.now();
         this.user = user;
         this.ticketType = ticketType;
         this.ticketPrice = ticketPrice;
+        this.payment = payment;
     }
 
 

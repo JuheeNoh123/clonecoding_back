@@ -24,6 +24,7 @@ public class BookingService {
     private final ScreeningRepository screeningRepository;
     private final SeatRepository seatRepository;
     private final BranchRepository branchRepository;
+    private final PaymentRepository paymentRepository;
     private final UserService userService;
 
     public BookingDTO.ShowSeatsDTO showBookingSeats(long movieId, long branchId,
@@ -37,8 +38,7 @@ public class BookingService {
         List<Seat> bookedSeats = bookingRepository.bookedSeats(screening, theater);
 
 
-        BookingDTO.ShowSeatsDTO showSeatsDTO = getShowSeatsDTO(theaterName, branch, bookedSeats);
-        return showSeatsDTO;
+        return getShowSeatsDTO(theaterName, branch, bookedSeats);
     }
 
     private static BookingDTO.ShowSeatsDTO getShowSeatsDTO(String theaterName, Branch branch, List<Seat> bookedSeats) {
@@ -71,7 +71,7 @@ public class BookingService {
 
     //row - A,B,C... column - 1,2,3...
     @Transactional
-    public void booking(String token, Long movieId, List<SeatDTO.Seats> seats,
+    public BookingDTO.checkBooking booking(String token, Long movieId, List<SeatDTO.Seats> seats,int paymentAmount, String paymentType, String easyPaymentType,
                         List<BookingDTO.TicketsCategory> ticketsCategories,
                         String theaterNum, Long branchId, LocalDate ScreeningDate, LocalTime screeningTime) {
         User user = userService.tokenToUser(token);
@@ -82,7 +82,8 @@ public class BookingService {
 
         // 영화 ID, 상영 날짜, 상영 시간을 기반으로 예매 번호 생성
         String bookingNumber = generateBookingNumber(movieId, ScreeningDate, screeningTime);
-
+        Payment payment = new Payment(bookingNumber, paymentAmount, user, paymentType, easyPaymentType);
+        paymentRepository.save(payment);
         int seatIndex = 0;
         for (BookingDTO.TicketsCategory ticketsCategory : ticketsCategories) {
             for (int i=0;i<ticketsCategory.getTicketCount();i++){
@@ -94,13 +95,28 @@ public class BookingService {
                 Seat findSeat = seatRepository.getSeat(seat.getRow(), seat.getNum(), theater);
                 int ticketPrice = getTicketPriceByType(ticketsCategory.getTicketType());
 
-                Booking booking = new Booking(screening, findSeat, user, ticketsCategory.getTicketType(), ticketPrice);
-                booking.setBookingNumber(bookingNumber);
+                Booking booking = new Booking(screening, findSeat, user, ticketsCategory.getTicketType(), ticketPrice, payment);
+//                booking.setBookingNumber(bookingNumber);
                 bookingRepository.save(booking);
 
                 seatIndex++;
             }
         }
+
+        BookingDTO.checkBooking response= new BookingDTO.checkBooking();
+        response.setBookingNum(bookingNumber);
+        response.setScreeningDate(ScreeningDate);
+        response.setScreeningTime(screeningTime);
+        response.setUserId(user.getUserId());
+        response.setMovieTitle(movie.getTitle());
+        response.setTheaterName(theater.getName()+'관');
+        response.setBranchName(branch.getName());
+        response.setSeats(seats);
+        response.setPaymentType(paymentType);
+        response.setEasyPaymentType(easyPaymentType);
+        response.setTicketsCategory(ticketsCategories);
+        response.setBookingDate(payment.getPaymentTime());
+        return response;
     }
 
     private int getTicketPriceByType(String ticketType) {
